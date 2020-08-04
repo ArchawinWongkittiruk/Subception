@@ -22,17 +22,9 @@ app.post('/', async (req, res) => {
       return response.data.nextPageToken;
     }
 
-    // Get a maximum of 200 subscribers' subscriptions
-
-    const token1 = await addToOutputAndGetNextToken(''); // Get first 50
-    if (token1) {
-      const token2 = await addToOutputAndGetNextToken(token1); // Get second 50
-      if (token2) {
-        const token3 = await addToOutputAndGetNextToken(token2); // Get third 50
-        if (token3) {
-          await addToOutputAndGetNextToken(token3); // Get last 50
-        }
-      }
+    let token = await addToOutputAndGetNextToken('');
+    while (token) {
+      token = await addToOutputAndGetNextToken(token);
     }
 
     output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
