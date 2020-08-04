@@ -15,16 +15,11 @@ app.post('/', async (req, res) => {
   try {
     const allSubs = [];
     const output = [];
+    const channelId = req.body.channelId;
 
-    async function addToOutputAndGetNextToken(pageToken) {
-      const response = await getResponse(req.body.channelId, pageToken);
-      await addToOutput(response.data.items, allSubs, output);
-      return response.data.nextPageToken;
-    }
-
-    let token = await addToOutputAndGetNextToken('');
+    let token = await addToOutputAndGetNextToken(allSubs, output, channelId, '');
     while (token) {
-      token = await addToOutputAndGetNextToken(token);
+      token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
     }
 
     output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
@@ -34,6 +29,12 @@ app.post('/', async (req, res) => {
     console.log(err);
   }
 });
+
+async function addToOutputAndGetNextToken(allSubs, output, channelId, pageToken) {
+  const response = await getResponse(channelId, pageToken);
+  await addToOutput(response.data.items, allSubs, output);
+  return response.data.nextPageToken;
+}
 
 async function getResponse(channelId, pageToken) {
   return await google.youtube('v3').subscriptions.list({
