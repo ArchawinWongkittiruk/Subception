@@ -5,3 +5,8 @@
 .channel {
   margin-bottom: 50px;
 }
+
+.loading {
+  display: flex;
+  justify-content: center;
+}
