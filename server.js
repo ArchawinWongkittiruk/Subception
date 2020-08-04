@@ -11,16 +11,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.post('/', async (req, res) => {
+app.get('/api/data', async (req, res) => {
   try {
     const allSubs = [];
     const output = [];
-    const channelId = req.body.channelId;
+    const channelId = req.query.channelId;
 
     let token = await addToOutputAndGetNextToken(allSubs, output, channelId, '');
-    while (token) {
-      token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
-    }
+    // while (token) {
+    //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+    // }
 
     output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
 
@@ -94,6 +94,6 @@ async function getSubs(channelId) {
   }
 }
 
-app.listen(3000, () => {
-  console.log('Running');
-});
+const port = 5000;
+
+app.listen(port, () => console.log(`Server started on port ${port}`));
