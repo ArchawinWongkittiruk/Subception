@@ -23,7 +23,7 @@ app.get('/api/data', async (req, res) => {
 
     res.json(output);
   } catch (err) {
-    console.log(err);
+    return res.status(404).json({ msg: 'Channel not found' });
   }
 });
 
@@ -86,7 +86,7 @@ async function getSubs(channelId) {
     });
     return subs;
   } catch (err) {
-    if (err.response.status !== 403) console.log(err);
+    if (err.response.status !== 403) return JSON.parse(err);
     return null;
   }
 }

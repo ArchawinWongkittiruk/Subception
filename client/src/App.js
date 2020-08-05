@@ -8,13 +8,21 @@ const App = () => {
   const [channels, setChannels] = useState([]);
   const [channelId, setChannelId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const res = await axios.get(`/api/data?channelId=${channelId}`);
-    setLoading(false);
-    setChannels(res.data);
+    setError('');
+    try {
+      const res = await axios.get(`/api/data?channelId=${channelId}`);
+      setChannels(res.data);
+    } catch (err) {
+      setError('Error: No channel with that ID found.');
+      setChannels([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,15 +41,17 @@ const App = () => {
           />
           <input type='submit' value='Submit' />
         </form>
+        <div className='error'>{error && <p>{error}</p>}</div>
       </div>
       <h2>Channels</h2>
       <div className='loading'>
         {loading && <ReactLoading type='spokes' color='lightgrey' />}
       </div>
       <div>
-        {!loading && channels.map((channel) => (
-          <Channel key={channel.channelId} channel={channel}></Channel>
-        ))}
+        {!loading &&
+          channels.map((channel) => (
+            <Channel key={channel.channelId} channel={channel}></Channel>
+          ))}
       </div>
     </div>
   );
