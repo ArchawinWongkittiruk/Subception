@@ -12,9 +12,9 @@ app.get('/api/data', async (req, res) => {
     const channelId = req.query.channelId;
 
     let token = await addToOutputAndGetNextToken(allSubs, output, channelId, '');
-    while (token) {
-      token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
-    }
+    // while (token) {
+    //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+    // }
 
     output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
 
