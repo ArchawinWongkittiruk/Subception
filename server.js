@@ -75,9 +75,8 @@ async function addToOutput(items, allSubs, output) {
 async function getSubs(channelId) {
   try {
     const response = await getResponse(channelId, '');
-    const { data } = response;
     const subs = [];
-    data.items.forEach(({ snippet }) => {
+    response.data.items.forEach(({ snippet }) => {
       subs.push({
         sub: snippet.title,
         channelId: snippet.resourceId.channelId,
@@ -86,7 +85,6 @@ async function getSubs(channelId) {
     });
     return subs;
   } catch (err) {
-    if (err.response.status !== 403) return JSON.parse(err);
     return null;
   }
 }
