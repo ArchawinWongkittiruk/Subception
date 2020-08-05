@@ -3,6 +3,7 @@ import ReactLoading from 'react-loading';
 import axios from 'axios';
 import './App.css';
 import Channel from './Channel';
+import sample from './sample.json';
 
 const App = () => {
   const [channels, setChannels] = useState([]);
@@ -53,7 +54,7 @@ const App = () => {
       )}
       <div>
         {!loading &&
-          channels.map((channel) => (
+          sample.map((channel) => (
             <Channel key={channel.channelId} channel={channel}></Channel>
           ))}
       </div>
