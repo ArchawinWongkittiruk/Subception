@@ -1,11 +1,8 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const { google } = require('googleapis');
 require('dotenv').config();
 
 const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
