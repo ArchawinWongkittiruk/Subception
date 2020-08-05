@@ -39,7 +39,7 @@ async function addToOutputAndGetNextToken(allSubs, output, channelId, pageToken)
 
 async function getResponse(channelId, pageToken) {
   return await google.youtube('v3').subscriptions.list({
-    key: process.env.YOUTUBE_TOKEN,
+    key: process.env.YOUTUBE_DATA_API_KEY,
     channelId,
     pageToken,
     part: 'snippet',
