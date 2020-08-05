@@ -33,6 +33,7 @@ const App = () => {
         <h3>Enter Your YouTube Channel ID</h3>
         <form onSubmit={(e) => onSubmit(e)}>
           <input
+            className='channelIdInput'
             type='text'
             placeholder='Your YouTube Channel ID'
             value={channelId}
