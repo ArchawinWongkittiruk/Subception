@@ -4,10 +4,6 @@ require('dotenv').config();
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
 app.get('/api/data', async (req, res) => {
   try {
     const allSubs = [];
