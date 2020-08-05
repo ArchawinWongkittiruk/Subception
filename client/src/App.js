@@ -19,7 +19,7 @@ const App = () => {
       const res = await axios.get(`/api/data?channelId=${channelId}`);
       setChannels(res.data);
     } catch (err) {
-      setError('Error: No channel with that ID found.');
+      setError('Error: No channel with that ID was found.');
       setChannels([]);
     } finally {
       setLoading(false);
@@ -31,7 +31,10 @@ const App = () => {
       <h1>Subception</h1>
       <p>Find out who the YouTube channels you subscribe to subscribe to.</p>
       <div>
-        <h3>Enter Your YouTube Channel ID</h3>
+        <h3>
+          Enter Your YouTube Channel ID
+          <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
+        </h3>
         <form onSubmit={(e) => onSubmit(e)}>
           <input
             className='channelIdInput'
