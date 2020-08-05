@@ -3,7 +3,7 @@ import ReactLoading from 'react-loading';
 import axios from 'axios';
 import './App.css';
 import Channel from './Channel';
-import sample from './sample.json';
+//import sample from './sample.json';
 
 const App = () => {
   const [channels, setChannels] = useState([]);
@@ -19,7 +19,9 @@ const App = () => {
       const res = await axios.get(`/api/data?channelId=${channelId}`);
       setChannels(res.data);
     } catch (err) {
-      setError('Error: No channel with that ID was found.');
+      setError(
+        'Error: No channel with that ID was found or the request was not allowed.'
+      );
       setChannels([]);
     } finally {
       setLoading(false);
@@ -28,36 +30,35 @@ const App = () => {
 
   return (
     <div>
-      <h1>Subception</h1>
+      <h1>SUBCEPTION</h1>
       <p>Find out who the YouTube channels you subscribe to subscribe to.</p>
-      <div>
-        <h3>
-          Enter Your YouTube Channel ID
-          <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
-        </h3>
-        <form onSubmit={(e) => onSubmit(e)}>
-          <input
-            className='channelIdInput'
-            type='text'
-            placeholder='Your YouTube Channel ID'
-            value={channelId}
-            onChange={(e) => setChannelId(e.target.value)}
-            required
-          />
-          <input type='submit' value='Submit' />
-        </form>
-        <div className='error'>{error && <p>{error}</p>}</div>
-      </div>
-      <h2>Channels</h2>
+      <h3>
+        Enter Your YouTube Channel ID
+        <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
+      </h3>
+      <form onSubmit={(e) => onSubmit(e)}>
+        <input
+          className='channelIdInput'
+          type='text'
+          placeholder='Your YouTube Channel ID'
+          value={channelId}
+          onChange={(e) => setChannelId(e.target.value)}
+          required
+        />
+        <input className='submit ' type='submit' value='Enter' />
+      </form>
+      <div className='error'>{error && <p>{error}</p>}</div>
+      <br />
+      {channels.length > 0 ? <h2>Channels</h2> : <br />}
       {loading && (
         <div className='loading'>
-          <ReactLoading type='spokes' color='lightgrey' />
+          <ReactLoading type='bars' color='lightgrey' />
           <p>This might take a while.</p>
         </div>
       )}
-      <div>
+      <div className='channels'>
         {!loading &&
-          sample.map((channel) => (
+          channels.map((channel) => (
             <Channel key={channel.channelId} channel={channel}></Channel>
           ))}
       </div>

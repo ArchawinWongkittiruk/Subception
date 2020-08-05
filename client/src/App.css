@@ -8,17 +8,48 @@
 
 body {
   margin: 0;
-  padding: 0;
+  padding: 50px;
+  background-color: #282828;
+  color: white;
+}
+
+@font-face {
+  font-family: 'GothamBold';
+  src: url('./GothamBold.otf');
+}
+
+h1 {
+  font-size: 3rem;
+  font-family: 'GothamBold';
+  color: crimson;
+}
+
+@media (max-width: 1250px) {
+  h1 {
+    font-size: 2.4rem;
+  }
 }
 
 a {
   text-decoration: none;
+  color: lightgrey;
+  transition: 0.2s;
+}
+
+a:hover {
+  color: lightslategrey;
 }
 
 /* Top */
 
 .channelIdInput {
+  height: 2rem;
   width: 250px;
+}
+
+.submit {
+  height: 2rem;
+  padding: 0 20px;
 }
 
 /* Loading */
@@ -32,6 +63,22 @@ a {
 
 /* Channels */
 
+.channels {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Channel */
+
 .channel {
-  margin-bottom: 50px;
+  width: 300px;
+  padding: 20px 50px;
+}
+
+.thumbnail {
+  border-radius: 50%;
+  width: 150px;
 }
