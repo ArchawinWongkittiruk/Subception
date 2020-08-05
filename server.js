@@ -11,7 +11,14 @@ app.get('/api/data', async (req, res) => {
     const output = [];
     const channelId = req.query.channelId;
 
+    // Get a maximum of 100 subscribers' subscriptions.
+
     let token = await addToOutputAndGetNextToken(allSubs, output, channelId, '');
+    if (token) await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+
+    // Ideally, we would be able to run through every subscription like below instead,
+    // but Heroku times out after 30 seconds so we can't.
+
     // while (token) {
     //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
     // }

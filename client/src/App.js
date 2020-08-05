@@ -31,7 +31,10 @@ const App = () => {
   return (
     <div>
       <h1>SUBCEPTION</h1>
-      <p>Find out who the YouTube channels you subscribe to subscribe to.</p>
+      <p>
+        Find out who the YouTube channels you subscribe to (up to a maximum of 100
+        channels) subscribe to.
+      </p>
       <h3>
         Enter Your YouTube Channel ID
         <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
