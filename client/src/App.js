@@ -44,9 +44,12 @@ const App = () => {
         <div className='error'>{error && <p>{error}</p>}</div>
       </div>
       <h2>Channels</h2>
-      <div className='loading'>
-        {loading && <ReactLoading type='spokes' color='lightgrey' />}
-      </div>
+      {loading && (
+        <div className='loading'>
+          <ReactLoading type='spokes' color='lightgrey' />
+          <p>This might take a while.</p>
+        </div>
+      )}
       <div>
         {!loading &&
           channels.map((channel) => (
