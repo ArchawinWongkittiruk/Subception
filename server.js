@@ -34,6 +34,11 @@ app.get('/api/data', async (req, res) => {
     output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
 
     res.json(output);
+
+    if (!pageToken) {
+      allSubs = [];
+      output = [];
+    }
   } catch (err) {
     if (err.code === 404) {
       return res.status(404).json('No channel with that ID was found.');
