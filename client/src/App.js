@@ -19,9 +19,7 @@ const App = () => {
       const res = await axios.get(`/api/data?channelId=${channelId}`);
       setChannels(res.data);
     } catch (err) {
-      setError(
-        'Error: No channel with that ID was found or the request was not allowed.'
-      );
+      setError(err.response.data);
       setChannels([]);
     } finally {
       setLoading(false);

@@ -27,7 +27,13 @@ app.get('/api/data', async (req, res) => {
 
     res.json(output);
   } catch (err) {
-    return res.status(404).json({ msg: 'Channel not found' });
+    if (err.code === 404) {
+      return res.status(404).json('No channel with that ID was found.');
+    } else if (err.code === 403) {
+      return res.status(403).json("This channel's subscriptions are private.");
+    } else {
+      return res.status(400).json('Error');
+    }
   }
 });
 
