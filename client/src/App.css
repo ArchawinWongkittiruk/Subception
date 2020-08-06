@@ -55,6 +55,7 @@ a:hover {
 /* Loading */
 
 .loading {
+  margin: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;

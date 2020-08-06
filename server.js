@@ -5,16 +5,24 @@ require('dotenv').config();
 
 const app = express();
 
+let channelId = '';
+let allSubs = [];
+let output = [];
+let pageToken = '';
+
 app.get('/api/data', async (req, res) => {
   try {
-    const allSubs = [];
-    const output = [];
-    const channelId = req.query.channelId;
+    if (channelId !== req.query.channelId) {
+      channelId = req.query.channelId;
+      allSubs = [];
+      output = [];
+      pageToken = '';
+    }
 
     // Get a maximum of 100 subscribers' subscriptions.
 
-    let token = await addToOutputAndGetNextToken(allSubs, output, channelId, '');
-    if (token) await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+    pageToken = await addToOutputAndGetNextToken();
+    if (pageToken) pageToken = await addToOutputAndGetNextToken();
 
     // Ideally, we would be able to run through every subscription like below instead,
     // but Heroku times out after 30 seconds so we can't.
@@ -37,9 +45,13 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
-async function addToOutputAndGetNextToken(allSubs, output, channelId, pageToken) {
+app.get('/api/pageToken', async (req, res) => {
+  res.json(pageToken);
+});
+
+async function addToOutputAndGetNextToken() {
   const response = await getResponse(channelId, pageToken);
-  await addToOutput(response.data.items, allSubs, output);
+  await addToOutput(response.data.items);
   return response.data.nextPageToken;
 }
 
@@ -53,7 +65,7 @@ async function getResponse(channelId, pageToken) {
   });
 }
 
-async function addToOutput(items, allSubs, output) {
+async function addToOutput(items) {
   for (const { snippet } of items) {
     const subs = await getSubs(snippet.resourceId.channelId);
 

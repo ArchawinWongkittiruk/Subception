@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactLoading from 'react-loading';
+import { Button } from '@material-ui/core';
 import axios from 'axios';
 import './App.css';
 import Channel from './Channel';
@@ -10,6 +11,8 @@ const App = () => {
   const [channelId, setChannelId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successfulChannelId, setSuccessfulChannelId] = useState('none');
+  const [allSubsDone, setAllSubsDone] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -18,9 +21,13 @@ const App = () => {
     try {
       const res = await axios.get(`/api/data?channelId=${channelId}`);
       setChannels(res.data);
+      setSuccessfulChannelId(channelId);
+      const pageToken = await axios.get('/api/pageToken');
+      pageToken.data ? setAllSubsDone(false) : setAllSubsDone(true);
     } catch (err) {
       setError(err.response.data);
       setChannels([]);
+      setSuccessfulChannelId('none');
     } finally {
       setLoading(false);
     }
@@ -29,10 +36,8 @@ const App = () => {
   return (
     <div>
       <h1>SUBCEPTION</h1>
-      <p>
-        Find out who the YouTube channels you subscribe to (up to a maximum of 100
-        channels) subscribe to.
-      </p>
+      <p>Find out who the YouTube channels you subscribe to* subscribe to.</p>
+      <small>*up to a max of 100 channels at a time</small>
       <h3>
         Enter Your YouTube Channel ID
         <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
@@ -46,23 +51,39 @@ const App = () => {
           onChange={(e) => setChannelId(e.target.value)}
           required
         />
-        <input className='submit ' type='submit' value='Enter' />
+        <input
+          className='submit'
+          type='submit'
+          value='Enter'
+          disabled={loading || channelId === successfulChannelId}
+        />
       </form>
-      <div className='error'>{error && <p>{error}</p>}</div>
-      <br />
-      {channels.length > 0 ? <h2>Channels</h2> : <br />}
-      {loading && (
+      {error && <p>{error}</p>}
+      {channels.length > 0 && (
+        <div>
+          <h2>Channels</h2>
+          <Button
+            variant='outlined'
+            color='secondary'
+            onClick={(e) => onSubmit(e)}
+            disabled={loading || allSubsDone}
+          >
+            See even more of your subscriptions' subscriptions
+          </Button>
+        </div>
+      )}
+      {loading ? (
         <div className='loading'>
           <ReactLoading type='bars' color='lightgrey' />
           <p>This might take a while.</p>
         </div>
-      )}
-      <div className='channels'>
-        {!loading &&
-          channels.map((channel) => (
+      ) : (
+        <div className='channels'>
+          {channels.map((channel) => (
             <Channel key={channel.channelId} channel={channel}></Channel>
           ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
