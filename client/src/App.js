@@ -80,7 +80,7 @@ const App = () => {
         />
       </form>
       {error && <p>{error}</p>}
-      {channels.length > 0 && (
+      {successfulChannelId !== 'none' && (
         <div>
           <h2>Channels</h2>
           <Button
@@ -89,8 +89,11 @@ const App = () => {
             onClick={(e) => onSubmit(e, 'getMoreChannels')}
             disabled={loading || allSubsDone}
           >
-            See even more of your subscriptions' subscriptions
+            Search through more of your subscriptions' subscriptions
           </Button>
+          {channels.length === 0 && ( // Extremely unlikely to happen
+            <h3>No common subscriptions' subscriptions found!</h3>
+          )}
         </div>
       )}
       {loading ? (
