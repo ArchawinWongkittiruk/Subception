@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactLoading from 'react-loading';
 import { Button } from '@material-ui/core';
 import axios from 'axios';
@@ -14,16 +14,38 @@ const App = () => {
   const [successfulChannelId, setSuccessfulChannelId] = useState('none');
   const [allSubsDone, setAllSubsDone] = useState(false);
 
-  const onSubmit = async (e) => {
+  // Data for getting from and passing back to server for compound searching
+  const [allSubs, setAllSubs] = useState([]);
+  const [pageToken, setPageToken] = useState('');
+
+  useEffect(() => {
+    pageToken ? setAllSubsDone(false) : setAllSubsDone(true);
+  }, [pageToken]);
+
+  const onSubmit = async (e, action) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    let body = {};
+    if (action === 'newChannelSubmit') {
+      body = { allSubs: [], output: [], pageToken: '' };
+    } else if (action === 'getMoreChannels') {
+      body = { allSubs, output: channels, pageToken };
+    }
+
+    const headers = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
     try {
-      const res = await axios.get(`/api/data?channelId=${channelId}`);
-      setChannels(res.data);
+      const res = await axios.post(`/api/data?channelId=${channelId}`, body, headers);
+      setChannels(JSON.parse(res.data.output));
+      setAllSubs(JSON.parse(res.data.allSubs));
+      setPageToken(res.data.token);
       setSuccessfulChannelId(channelId);
-      const pageToken = await axios.get('/api/pageToken');
-      pageToken.data ? setAllSubsDone(false) : setAllSubsDone(true);
     } catch (err) {
       setError(err.response.data);
       setChannels([]);
@@ -41,7 +63,7 @@ const App = () => {
         Enter Your YouTube Channel ID
         <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
       </h3>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => onSubmit(e, 'newChannelSubmit')}>
         <input
           className='channelIdInput'
           type='text'
@@ -64,7 +86,7 @@ const App = () => {
           <Button
             variant='outlined'
             color='secondary'
-            onClick={(e) => onSubmit(e)}
+            onClick={(e) => onSubmit(e, 'getMoreChannels')}
             disabled={loading || allSubsDone}
           >
             See even more of your subscriptions' subscriptions

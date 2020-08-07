@@ -5,24 +5,23 @@ require('dotenv').config();
 
 const app = express();
 
-let channelId = '';
-let allSubs = [];
-let output = [];
-let pageToken = '';
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-app.get('/api/data', async (req, res) => {
+// It makes way more sense to use a get method, but we need to pass in a body
+// so a post method will have to do.
+app.post('/api/data', async (req, res) => {
   try {
-    if (channelId !== req.query.channelId) {
-      channelId = req.query.channelId;
-      allSubs = [];
-      output = [];
-      pageToken = '';
-    }
+    const channelId = req.query.channelId;
+    const allSubs = req.body.allSubs;
+    const output = req.body.output;
+    let token = req.body.pageToken;
 
     // Get a maximum of 100 subscribers' subscriptions.
-
-    pageToken = await addToOutputAndGetNextToken();
-    if (pageToken) pageToken = await addToOutputAndGetNextToken();
+    token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+    // if (token) {
+    //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
+    // }
 
     // Ideally, we would be able to run through every subscription like below instead,
     // but Heroku times out after 30 seconds so we can't.
@@ -31,14 +30,9 @@ app.get('/api/data', async (req, res) => {
     //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
     // }
 
-    output.sort((a, b) => a.subbers.length - b.subbers.length).reverse();
+    output.sort((a, b) => b.subbers.length - a.subbers.length);
 
-    res.json(output);
-
-    if (!pageToken) {
-      allSubs = [];
-      output = [];
-    }
+    res.send({ token, allSubs: JSON.stringify(allSubs), output: JSON.stringify(output) });
   } catch (err) {
     if (err.code === 404) {
       return res.status(404).json('No channel with that ID was found.');
@@ -50,13 +44,9 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
-app.get('/api/pageToken', async (req, res) => {
-  res.json(pageToken);
-});
-
-async function addToOutputAndGetNextToken() {
+async function addToOutputAndGetNextToken(allSubs, output, channelId, pageToken) {
   const response = await getResponse(channelId, pageToken);
-  await addToOutput(response.data.items);
+  await addToOutput(response.data.items, allSubs, output);
   return response.data.nextPageToken;
 }
 
@@ -70,7 +60,7 @@ async function getResponse(channelId, pageToken) {
   });
 }
 
-async function addToOutput(items) {
+async function addToOutput(items, allSubs, output) {
   for (const { snippet } of items) {
     const subs = await getSubs(snippet.resourceId.channelId);
 
