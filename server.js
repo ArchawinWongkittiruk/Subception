@@ -17,7 +17,7 @@ app.post('/api/data', async (req, res) => {
     const output = req.body.output;
     let token = req.body.pageToken;
 
-    // Get a maximum of 100 subscribers' subscriptions.
+    // Get a maximum of 100 subscriptions' subscriptions.
     token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
     if (token) {
       token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
