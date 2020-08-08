@@ -17,22 +17,30 @@ app.post('/api/data', async (req, res) => {
     const output = req.body.output;
     let token = req.body.pageToken;
 
-    // Get a maximum of 100 subscriptions' subscriptions.
-    token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
-    if (token) {
-      token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
-    }
+    // Get a maximum of 50 subscriptions' subscriptions at a time.
+    const response = await getResponse(channelId, token);
+    token = response.data.nextPageToken;
 
-    // Ideally, we would be able to run through every subscription like below instead,
-    // but Heroku times out after 30 seconds so we can't.
+    // Send the output, complete or not, after no more than 25 seconds to prevent
+    // the Heroku server request from timing out after the 30 second limit.
 
-    // while (token) {
-    //   token = await addToOutputAndGetNextToken(allSubs, output, channelId, token);
-    // }
+    const timeout = new Promise((resolve) => {
+      setTimeout(() => resolve('timeout'), 25000);
+    });
 
-    output.sort((a, b) => b.subbers.length - a.subbers.length);
+    const complete = new Promise(async (resolve) => {
+      await addToOutput(response.data.items, allSubs, output);
+      resolve('complete');
+    });
 
-    res.send({ token, allSubs: JSON.stringify(allSubs), output: JSON.stringify(output) });
+    Promise.race([timeout, complete]).then(() => {
+      output.sort((a, b) => b.subbers.length - a.subbers.length);
+      res.send({
+        token,
+        allSubs: JSON.stringify(allSubs),
+        output: JSON.stringify(output),
+      });
+    });
   } catch (err) {
     if (err.code === 404) {
       return res.status(404).json('No channel with that ID was found.');
@@ -43,12 +51,6 @@ app.post('/api/data', async (req, res) => {
     }
   }
 });
-
-async function addToOutputAndGetNextToken(allSubs, output, channelId, pageToken) {
-  const response = await getResponse(channelId, pageToken);
-  await addToOutput(response.data.items, allSubs, output);
-  return response.data.nextPageToken;
-}
 
 async function getResponse(channelId, pageToken) {
   return await google.youtube('v3').subscriptions.list({
@@ -91,19 +93,31 @@ async function addToOutput(items, allSubs, output) {
 
 async function getSubs(channelId) {
   try {
-    const response = await getResponse(channelId, '');
     const subs = [];
-    response.data.items.forEach(({ snippet }) => {
-      subs.push({
-        sub: snippet.title,
-        channelId: snippet.resourceId.channelId,
-        thumbnail: snippet.thumbnails.default.url,
-      });
-    });
+
+    // Look for a maximum of 200 subscriptions.
+    // 200 because it is something of a sweet spot between speed and completeness.
+    let token = await addToSubsAndGetNextToken(subs, channelId, '');
+    if (token) token = await addToSubsAndGetNextToken(subs, channelId, token);
+    if (token) token = await addToSubsAndGetNextToken(subs, channelId, token);
+    if (token) await addToSubsAndGetNextToken(subs, channelId, token);
+
     return subs;
   } catch (err) {
     return null;
   }
+}
+
+async function addToSubsAndGetNextToken(subs, channelId, pageToken) {
+  const response = await getResponse(channelId, pageToken);
+  response.data.items.forEach(({ snippet }) => {
+    subs.push({
+      sub: snippet.title,
+      channelId: snippet.resourceId.channelId,
+      thumbnail: snippet.thumbnails.default.url,
+    });
+  });
+  return response.data.nextPageToken;
 }
 
 // Serve static assets in production
