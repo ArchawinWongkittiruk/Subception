@@ -61,8 +61,15 @@ const App = () => {
       <p>Find out who the YouTube channels you subscribe to subscribe to.</p>
       <h3>
         Enter Your YouTube Channel ID
-        <a href='https://www.youtube.com/account_advanced'> From Your Account</a>
+        <a className='youtubeLink' href='https://www.youtube.com/account_advanced'>
+          {' '}
+          From Your Account
+        </a>
       </h3>
+      <small>
+        If you are directed to the YouTube mobile app and the page is blank, please
+        request the desktop website from the options to see your channel ID.
+      </small>
       <form onSubmit={(e) => onSubmit(e, 'newChannelSubmit')}>
         <input
           className='channelIdInput'

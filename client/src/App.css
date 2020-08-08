@@ -24,9 +24,18 @@ h1 {
   color: crimson;
 }
 
+small {
+  visibility: hidden;
+  position: fixed;
+}
+
 @media (max-width: 1250px) {
   h1 {
     font-size: 2.4rem;
+  }
+  small {
+    visibility: visible;
+    position: static;
   }
 }
 
@@ -42,9 +51,23 @@ a:hover {
 
 /* Top */
 
+.youtubeLink {
+  color: lightslategrey;
+}
+
+.youtubeLink:hover {
+  color: grey;
+}
+
 .channelIdInput {
   height: 2rem;
   width: 250px;
+}
+
+@media (max-width: 1250px) {
+  .channelIdInput {
+    margin-top: 20px;
+  }
 }
 
 .submit {
